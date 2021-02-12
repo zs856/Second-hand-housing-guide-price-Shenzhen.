@@ -1,3 +1,7 @@
+import json
+import logging
+
+from baidu_map_util import get_geocoding_result
 from data_operate import shape_data
 from pdf_util import extract_pdf
 
@@ -10,6 +14,24 @@ def main():
     body = data[3:]
     print("数据准备完毕，当前数据更新于2021年2月12日")
     df = shape_data(header, body)
+    print("开始获取地理数据")
+    places = df['项目名称']
+    geo_data_dict = {}
+    for place in places:
+        print("当前正在获取:", place, " 的地理信息")
+        res = get_geocoding_result(query=place, region="深圳")
+        if res == -2:
+            logging.warning("没有获取到"+place+"的地理数据")
+            continue
+        if res == -1:
+            logging.warning("地理数据没有完全获得")
+            break
+        print(res)
+        geo_data_dict.update(res)
+    with open('output/geo_data.json', 'w', encoding='utf-8', ) as f:
+        json.dump(geo_data_dict, f, ensure_ascii=False)
+    print("总共", len(geo_data_dict), "条地理数据被成功获取")
+    print("地理数据获取完毕")
     print("请输入您想查找的小区或项目名称")
     print("如果想获取所有信息，请输入all")
     while True:
