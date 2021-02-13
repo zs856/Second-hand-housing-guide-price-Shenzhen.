@@ -4,7 +4,7 @@ import os
 
 from baidu_map_util import get_geocoding_result
 from constant import shenzhen_data_csv_path, input_path, geo_data_json
-from data_operate import shape_data, to_csv, read_data_from_csv, fuzzy_finder
+from data_operate_util import shape_data, to_csv, read_data_from_csv, fuzzy_finder
 from pdf_util import extract_pdf
 
 

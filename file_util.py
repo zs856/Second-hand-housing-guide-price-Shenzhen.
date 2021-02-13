@@ -1,8 +1,12 @@
 import json
+import logging
 import os
 from datetime import datetime
 
-from constant import shenzhen_data_csv_path
+import constant
+
+
+
 
 
 def save_data(data):
@@ -16,5 +20,3 @@ def save_data(data):
     file_path = os.path.join(cwd_path, date_str + '.json')
     with open(file_path, 'w') as f:
         json.dump(data, f)
-
-

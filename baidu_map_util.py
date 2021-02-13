@@ -33,7 +33,7 @@ def conduct_geocoding(query, region, page_num):
 
 def get_geocoding_result(query, region):
     """
-    该方法用于获取查询每个小区的地理信息
+    该方法用于获取查询一个小区的地理信息
     :param query:要查询的小区名
     :param region:
     :return:
@@ -80,7 +80,13 @@ def get_places_in_geo_data_file():
 
 
 def get_the_geocoding_of_all_items(places):
+    """
+    该函数用于获取所有小区的地理编码
+    :param places:
+    :return:
+    """
     print("开始获取地理数据")
+    set_baidu_ak("D:\projects\百度ak.json")
     geo_data_dict = {}
     if os.path.exists(constant.geo_data_json):
         geo_data_dict = json.load(constant.geo_data_json)
@@ -99,3 +105,14 @@ def get_the_geocoding_of_all_items(places):
     with open('output/geo_data.json', 'w', encoding='utf-8', ) as f:
         json.dump(geo_data_dict, f, ensure_ascii=False)
     print("总共", len(geo_data_dict), "条地理数据被成功获取")
+
+
+def set_baidu_ak(path):
+    """
+    设置百度地图的ak码，ak将会从一个json文件中读取，确保字段格式为 {"al":""}
+    :param path:
+    :return:
+    """
+    if not os.path.exists(path):
+        logging.error("path to access ak is not exist")
+    constant.baidu_map_ak = json.load(path)['ak']

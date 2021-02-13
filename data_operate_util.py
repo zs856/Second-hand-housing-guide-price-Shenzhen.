@@ -6,8 +6,13 @@ from constant import shenzhen_data_csv_path
 
 
 def shape_data(header, body):
+    """
+    该方法用于从pdf获取数据的时候塑造dataframe形式的数据
+    :param header:
+    :param body:
+    :return:
+    """
     pd.set_option('display.max_rows', None)
-    data = []
     df = pd.DataFrame(body)
     df.columns = header
     return df
@@ -24,6 +29,11 @@ def to_csv(dataframe):
 
 
 def read_data_from_csv(path):
+    """
+    该方法用于从csv文件中获取数据
+    :param path:
+    :return:
+    """
     pd.set_option('display.max_rows', None)
     return pd.read_csv(path)
 
