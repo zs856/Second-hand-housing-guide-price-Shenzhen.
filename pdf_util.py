@@ -3,6 +3,7 @@ import constant
 
 
 def extract_pdf():
+    print("开始提取数据")
     data = []
     pdf = pdfplumber.open(constant.input_path)
     for page in pdf.pages:
