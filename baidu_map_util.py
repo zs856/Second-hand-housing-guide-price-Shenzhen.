@@ -41,26 +41,30 @@ def get_geocoding_result(query, region):
     page_num = 0
     fail_count = 0
     while fail_count < 3:
-        res = conduct_geocoding(query, region, page_num)
-        if res.get("results"):
-            return res["results"][0]
-        print(res.get("status"))
-        status = res.get("status")
-        if status == 2:
-            logging.error("请求参数非法")
-            return -1
-        if status == 3:
-            logging.error("权限校验失败")
-            return -1
-        if status == 4:
-            logging.error("配额校验失败")
-            return -1
-        if status == 5:
-            logging.error("ak不存在或者非法")
-            return -1
-        fail_count += 1
-        time.sleep(1)
-        logging.warning("重试获取")
+        try:
+            res = conduct_geocoding(query, region, page_num)
+            if res.get("results"):
+                return res["results"][0]
+            print(res.get("status"))
+            status = res.get("status")
+            if status == 2 or status == 302:
+                logging.error("请求参数非法")
+                return -1
+            if status == 3:
+                logging.error("权限校验失败")
+                return -1
+            if status == 4:
+                logging.error("配额校验失败")
+                return -1
+            if status == 5:
+                logging.error("ak不存在或者非法")
+                return -1
+            fail_count += 1
+            time.sleep(1)
+            logging.warning("重试获取")
+        except Exception as e:
+            logging.error(str(e))
+            continue
     return -2
 
 
@@ -82,14 +86,15 @@ def get_places_in_geo_data_file():
 def get_the_geocoding_of_all_items(places):
     """
     该函数用于获取所有小区的地理编码
+    
     :param places:
     :return:
     """
     print("开始获取地理数据")
-    set_baidu_ak("D:\projects\百度ak.json")
-    geo_data_dict = {}
+    set_baidu_ak(r"D:\projects\百度ak.json")
+    geo_data_list = []
     if os.path.exists(constant.geo_data_json):
-        geo_data_dict = json.load(constant.geo_data_json)
+        geo_data_dict = json.load(open(constant.geo_data_json))
     for place in places:
         print("当前正在获取:", place, " 的地理信息")
         res = get_geocoding_result(query=place, region="深圳")
@@ -101,10 +106,10 @@ def get_the_geocoding_of_all_items(places):
             break
         res.update({"place": place})
         print(res)
-        geo_data_dict.update(res)
+        geo_data_list.append(res)
     with open('output/geo_data.json', 'w', encoding='utf-8', ) as f:
-        json.dump(geo_data_dict, f, ensure_ascii=False)
-    print("总共", len(geo_data_dict), "条地理数据被成功获取")
+        json.dump(geo_data_list, f, ensure_ascii=False)
+    print("总共", len(geo_data_list), "条地理数据被成功获取")
 
 
 def set_baidu_ak(path):
@@ -115,4 +120,5 @@ def set_baidu_ak(path):
     """
     if not os.path.exists(path):
         logging.error("path to access ak is not exist")
-    constant.baidu_map_ak = json.load(path)['ak']
+    with open(path, 'r', encoding='utf-8', ) as f:
+        constant.baidu_map_ak = json.load(f)['ak']
